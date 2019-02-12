@@ -1,0 +1,30 @@
+query SearchMostTop10Star($user: String!, $afterCursor: String) {
+  search(query: $user, type: USER, first: 10, after:$afterCursor) {
+    pageInfo {
+      endCursor
+      startCursor
+      hasNextPage
+    }
+    userCount
+    edges {
+      node {
+        ... on User {
+          name
+          login
+          avatarUrl
+          starredRepositories{
+            totalCount
+          } 
+          url
+          bio
+          followers{
+            totalCount
+          }
+          following{
+            totalCount
+          }
+        }
+      }
+    }
+  }
+}

@@ -51,7 +51,7 @@
         "error",
         {
           "env": "literal",
-          "projectName": "app"
+          "projectName": "github"
         }
       ]
     },

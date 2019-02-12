@@ -4,7 +4,7 @@
     <div class="form">
       <label for="field-name" class="label">Name</label>
       <input
-        v-model="name"
+        v-model="user"
         placeholder="Type a name"
         class="input"
         id="field-name"
@@ -13,8 +13,11 @@
 
     <!-- Apollo watched Graphql query -->
     <ApolloQuery
-      :query="require('../graphql/HelloWorld.gql')"
-      :variables="{ name }"
+      
+      :query="require('../graphql/User.gql')"
+      :variables="{ 
+        user,
+        afterCursor }"
     >
       <template slot-scope="{ result: { loading, error, data } }">
         <!-- Loading -->
@@ -24,128 +27,80 @@
         <div v-else-if="error" class="error apollo">An error occured</div>
 
         <!-- Result -->
-        <div v-else-if="data" class="result apollo">{{ data.hello }}</div>
+        <div v-else-if="data" class="result apollo">
+          Total user found: {{ data.search.userCount }}
+          <div v-for="(edge, key) in data.search.edges" v-bind="key">
+
+            1: {{edge.node.name}},
+            2: {{edge.node.avatarUrl}},
+            3: {{edge.node.bio}},
+            4: {{edge.node.followers.totalCount}},
+            5: {{edge.node.following.totalCount}},
+            6: {{edge.node.starredRepositories.totalCount}},
+            7: {{edge.node.url}}
+
+
+
+          </div>
+        </div>
 
         <!-- No result -->
         <div v-else class="no-result apollo">No result :(</div>
       </template>
     </ApolloQuery>
-
-    <!-- Tchat example -->
-    <ApolloQuery
-      :query="require('../graphql/Messages.gql')"
-    >
-      <ApolloSubscribeToMore
-        :document="require('../graphql/MessageAdded.gql')"
-        :update-query="onMessageAdded"
-      />
-
-      <div slot-scope="{ result: { data } }">
-        <template v-if="data">
-          <div
-            v-for="message of data.messages"
-            :key="message.id"
-            class="message"
-          >
-            {{ message.text }}
-          </div>
-        </template>
-      </div>
-    </ApolloQuery>
-
-    <ApolloMutation
-      :mutation="require('../graphql/AddMessage.gql')"
-      :variables="{
-        input: {
-          text: newMessage,
-        },
-      }"
-      class="form"
-      @done="newMessage = ''"
-    >
-      <template slot-scope="{ mutate }">
-        <form v-on:submit.prevent="formValid && mutate()">
-          <label for="field-message">Message</label>
-          <input
-            id="field-message"
-            v-model="newMessage"
-            placeholder="Type a message"
-            class="input"
-          >
-        </form>
-      </template>
-    </ApolloMutation>
-
-    <div class="images">
-      <div
-        v-for="file of files"
-        :key="file.id"
-        class="image-item"
-      >
-        <img :src="`${$filesRoot}/${file.path}`" class="image"/>
-      </div>
-    </div>
-
-    <div class="image-input">
-      <label for="field-image">Image</label>
-      <input
-        id="field-image"
-        type="file"
-        accept="image/*"
-        required
-        @change="onUploadImage"
-      >
-    </div>
   </div>
 </template>
 
 <script>
-import FILES from '../graphql/Files.gql'
-import UPLOAD_FILE from '../graphql/UploadFile.gql'
+import { onLogin } from '../vue-apollo'
+import { async } from 'q';
 
 export default {
   data () {
     return {
-      name: 'Anne',
-      newMessage: '',
+      user: 'Zelig',
+      afterCursor: null,
+      search: {},
+      page: 0,
+      showMoreEnabled: true,
     }
   },
-
-  apollo: {
-    files: FILES,
-  },
-
-  computed: {
-    formValid () {
-      return this.newMessage
-    },
-  },
-
   methods: {
-    onMessageAdded (previousResult, { subscriptionData }) {
-      return {
-        messages: [
-          ...previousResult.messages,
-          subscriptionData.data.messageAdded,
-        ],
-      }
+    async login(){
+        const apolloClient = this.$apollo.provider.defaultClient
+        await onLogin(apolloClient, 'a3886ef3a2894604ae4452bc736ded5660abda54')
     },
-
-    async onUploadImage ({ target }) {
-      if (!target.validity.valid) return
-      await this.$apollo.mutate({
-        mutation: UPLOAD_FILE,
+    showMore () {
+      this.page++
+      // Fetch more data and transform the original result
+      this.$apollo.queries.tagsPage.fetchMore({
+        // New variables
         variables: {
-          file: target.files[0],
+          page: this.page,
+          pageSize,
         },
-        update: (store, { data: { singleUpload } }) => {
-          const data = store.readQuery({ query: FILES })
-          data.files.push(singleUpload)
-          store.writeQuery({ query: FILES, data })
-        },
+        // Transform the previous result with new data
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const newTags = fetchMoreResult.tagsPage.tags
+          const hasMore = fetchMoreResult.tagsPage.hasMore
+
+          this.showMoreEnabled = hasMore
+
+          return {
+            tagsPage: {
+              __typename: previousResult.tagsPage.__typename,
+              // Merging the tag list
+              tags: [...previousResult.tagsPage.tags, ...newTags],
+              hasMore,
+            }
+          }
+        }
       })
     }
   },
+  beforeMount(){
+    this.login();
+  }
 }
 </script>
 

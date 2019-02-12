@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import VueApollo from 'vue-apollo'
+import schema from '../schema.json'
+import { IntrospectionFragmentMatcher, InMemoryCache } from 'apollo-cache-inmemory';
 import { createApolloClient, restartWebsockets } from 'vue-cli-plugin-apollo/graphql-client'
 
 // Install the vue plugin
@@ -14,6 +16,10 @@ const httpEndpoint = process.env.VUE_APP_GRAPHQL_HTTP || 'https://api.github.com
 export const filesRoot = process.env.VUE_APP_FILES_ROOT || httpEndpoint.substr(0, httpEndpoint.indexOf('/graphql'))
 
 Vue.prototype.$filesRoot = filesRoot
+
+const fragmentMatcher = new IntrospectionFragmentMatcher({
+  introspectionQueryResultData: schema,
+});
 
 // Config
 const defaultOptions = {
@@ -38,7 +44,7 @@ const defaultOptions = {
   // link: myLink
 
   // Override default cache
-  // cache: myCache
+  cache: new InMemoryCache({ fragmentMatcher }),
 
   // Override the way the Authorization header is set
   getAuth: (tokenName) => {  

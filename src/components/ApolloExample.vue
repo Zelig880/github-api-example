@@ -1,53 +1,32 @@
 <template>
-  <div class="apollo-example">
-    <!-- Cute tiny form -->
+  <div>
     <div class="form">
       <label for="field-name" class="label">Name</label>
       <input
-        v-model="user"
         placeholder="Type a name"
         class="input"
         id="field-name"
+        ref="userInput"
       >
+      
+      <button @click="triggerQuery()" @disabled="$apollo.queries.search.loading" >Search</button>
+    </div>
+    <div> Currently showing page number: {{ currentPage }} </div>
+    <div v-if="$apollo.loading">Loading...</div>
+    <div v-if="showResult">
+          Total user found: {{ search.userCount }}
+          <div v-for="(node, key) in search.nodes" :key="key" v-if="node.__typename === 'User'"> 
+            1: {{node.name}},
+            2: {{node.avatarUrl}},
+            3: {{node.bio}},
+            6: {{node.starredRepositories.totalCount}},
+            7: {{node.url}}
+          </div>
     </div>
 
-    <!-- Apollo watched Graphql query -->
-    <ApolloQuery
-      
-      :query="require('../graphql/User.gql')"
-      :variables="{ 
-        user,
-        afterCursor }"
-    >
-      <template slot-scope="{ result: { loading, error, data } }">
-        <!-- Loading -->
-        <div v-if="loading" class="loading apollo">Loading...</div>
-
-        <!-- Error -->
-        <div v-else-if="error" class="error apollo">An error occured</div>
-
-        <!-- Result -->
-        <div v-else-if="data" class="result apollo">
-          Total user found: {{ data.search.userCount }}
-          <div v-for="(edge, key) in data.search.edges" v-bind="key">
-
-            1: {{edge.node.name}},
-            2: {{edge.node.avatarUrl}},
-            3: {{edge.node.bio}},
-            4: {{edge.node.followers.totalCount}},
-            5: {{edge.node.following.totalCount}},
-            6: {{edge.node.starredRepositories.totalCount}},
-            7: {{edge.node.url}}
-
-
-
-          </div>
-        </div>
-
-        <!-- No result -->
-        <div v-else class="no-result apollo">No result :(</div>
-      </template>
-    </ApolloQuery>
+    <button @click="nextPage()" :disabled="!nextPageAvailable" >Next page</button>
+    <button @click="previousPage()" :disabled="!previousPageAvailable">Previous page</button>
+    
   </div>
 </template>
 
@@ -58,44 +37,72 @@ import { async } from 'q';
 export default {
   data () {
     return {
-      user: 'Zelig',
-      afterCursor: null,
+      nextPageCursor: null,
+      previousPageCursor: null,
       search: {},
-      page: 0,
-      showMoreEnabled: true,
+      userInput: "Zelig",
+      queryDisabled: true,
+      currentPage: 1
+    }
+  },
+  apollo:{
+    search:{
+      query: require('../graphql/User.gql'),
+      variables() {
+        return {
+            user: this.userInput,
+            afterCursor:  this.nextPageCursor,
+            beforeCursor: this.previousPageCursor
+        }
+      },
+      fetchPolicy: 'cache-and-network',
+      skip() {
+        return this.queryDisabled
+      }
+    }
+  },
+  computed: {
+    nextPageAvailable(){
+
+      if(!this.search.hasOwnProperty("pageInfo")) return false;
+
+      return this.search.pageInfo.hasNextPage;
+    },
+    previousPageAvailable(){
+      if(!this.search.hasOwnProperty("pageInfo")) return false;
+
+      return this.currentPage > 1;
+    },
+    showResult(){
+      var queryIsEmpty = this.search.hasOwnProperty("userCount");
+      var graphQlLoading = this.$apollo.loading;
+
+      if (!queryIsEmpty || graphQlLoading){
+        return false;
+      }else{
+        return true;
+      }
     }
   },
   methods: {
     async login(){
         const apolloClient = this.$apollo.provider.defaultClient
-        await onLogin(apolloClient, 'a3886ef3a2894604ae4452bc736ded5660abda54')
+        await onLogin(apolloClient, 'bd8cd29334eaf9fc425e4d5957605432327d6838')
     },
-    showMore () {
-      this.page++
-      // Fetch more data and transform the original result
-      this.$apollo.queries.tagsPage.fetchMore({
-        // New variables
-        variables: {
-          page: this.page,
-          pageSize,
-        },
-        // Transform the previous result with new data
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const newTags = fetchMoreResult.tagsPage.tags
-          const hasMore = fetchMoreResult.tagsPage.hasMore
-
-          this.showMoreEnabled = hasMore
-
-          return {
-            tagsPage: {
-              __typename: previousResult.tagsPage.__typename,
-              // Merging the tag list
-              tags: [...previousResult.tagsPage.tags, ...newTags],
-              hasMore,
-            }
-          }
-        }
-      })
+    nextPage () {
+      this.nextPageCursor = this.search.pageInfo.endCursor;
+      this.previousPageCursor = null;
+      this.currentPage++;
+    },
+    previousPage(){
+      this.previousPageCursor = this.search.pageInfo.startCursor;
+      this.nextPageCursor = null;
+      this.currentPage--;
+    },
+    triggerQuery(){
+      this.userInput = this.$refs.userInput.value;
+      this.queryDisabled = false;
+      this.currentPage= 1;
     }
   },
   beforeMount(){

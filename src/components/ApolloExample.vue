@@ -12,68 +12,50 @@
       <button @click="triggerQuery()" @disabled="$apollo.queries.search.loading" >Search</button>
     </div>
 
-    <div v-if="showResult" class="searchStats">
-      <button @click="previousPage()" :disabled="!previousPageAvailable">Previous page</button>
-      <span>Current Page: {{ currentPage }}</span>
-      <span>Total Page: {{ totalPages }}</span>
-      <span>Total Users: {{ search.userCount }}</span>
-      <button @click="nextPage()" :disabled="!nextPageAvailable" >Next page</button>
-    </div>
+    <UserStats 
+      :search="search"
+      :showResult="showResult"
+      @PageEvent="triggerQuery"
+    ></UserStats>
 
     <div v-if="$apollo.loading">Loading...</div>
-    <div v-if="showResult">
-      <div> Currently showing page number: {{ currentPage }} </div>
-      <div id="userContainer">
-        <div 
-          class="user" 
-          v-for="(node, key) in search.nodes" 
-          :key="key" 
-          v-if="node.__typename === 'User'"
-        > 
-          <img class="avatar" :src="node.avatarUrl" :alt="node.name + 'avatar Image'" />
-          <h2>{{node.name}}</h2>
-          <h3>{{node.bio}}</h3>
-          <p>
-            FOLLOWING:  {{node.starredRepositories.totalCount}}<br/>
-            FOLLOWERS:  {{node.followers.totalCount}}<br/>
-            STARRED REPOs: {{node.following.totalCount}}
-          </p>
-          <a :href="node.url" target="_blank">Go to Profile</a>
-        </div>
-      </div>
-      
-      <button @click="previousPage()" :disabled="!previousPageAvailable">Previous page</button>
-      <button @click="nextPage()" :disabled="!nextPageAvailable" >Next page</button>
-    </div>
+    <UserContainer 
+      :search="search"
+      :showResult="showResult">
+    </UserContainer>
 
-    
+    <UserStats 
+      :search="search"
+      :showResult="showResult"
+      @PageEvent="triggerQuery"
+    ></UserStats>
   </div>
 </template>
 
 <script>
 import { onLogin } from '../vue-apollo'
 import { async } from 'q';
+import UserStats from './UserStats.vue'
+import UserContainer from './UserContainer.vue'
 
 export default {
   data () {
     return {
-      nextPageCursor: null,
-      previousPageCursor: null,
       search: {},
-      userInput: "Zelig",
-      queryDisabled: true,
-      currentPage: 1
+      queryDisabled: true
     }
+  },
+  components: {
+    UserStats,
+    UserContainer
   },
   apollo:{
     search:{
       query: require('../graphql/User.gql'),
-      variables() {
-        return {
-            user: this.userInput,
-            afterCursor:  this.nextPageCursor,
-            beforeCursor: this.previousPageCursor
-        }
+      variables: {
+          user: "",
+          afterCursor:  null,
+          beforeCursor: null
       },
       fetchPolicy: 'cache-and-network',
       skip() {
@@ -82,17 +64,6 @@ export default {
     }
   },
   computed: {
-    nextPageAvailable(){
-
-      if(!this.searchCompleted()) return false;
-
-      return this.search.pageInfo.hasNextPage;
-    },
-    previousPageAvailable(){
-      if(!this.searchCompleted()) return false;
-
-      return this.currentPage > 1;
-    },
     showResult(){
       var graphQlLoading = this.$apollo.loading;
 
@@ -101,13 +72,6 @@ export default {
       }else{
         return true;
       }
-    },
-    totalPages(){
-      if(!this.searchCompleted()) return 0;
-      
-      var totalPages = Math.ceil(this.search.userCount / 10);
-
-      return totalPages;
     }
   },
   methods: {
@@ -115,20 +79,19 @@ export default {
         const apolloClient = this.$apollo.provider.defaultClient
         await onLogin(apolloClient, 'bd8cd29334eaf9fc425e4d5957605432327d6838')
     },
-    nextPage () {
-      this.nextPageCursor = this.search.pageInfo.endCursor;
-      this.previousPageCursor = null;
-      this.currentPage++;
-    },
-    previousPage(){
-      this.previousPageCursor = this.search.pageInfo.startCursor;
-      this.nextPageCursor = null;
-      this.currentPage--;
-    },
-    triggerQuery(){
-      this.userInput = this.$refs.userInput.value;
+    triggerQuery(action, cursor){
       this.queryDisabled = false;
-      this.currentPage= 1;
+
+      this.$apollo.queries.search.options.variables.user = this.$refs.userInput.value;
+      if(action === "nextPage"){
+        this.$apollo.queries.search.options.variables.afterCursor = cursor;
+        this.$apollo.queries.search.options.variables.beforeCursor = null;
+      }else{
+        this.$apollo.queries.search.options.variables.afterCursor = null;
+        this.$apollo.queries.search.options.variables.beforeCursor = cursor;
+      }
+
+      this.$apollo.queries.search.refresh()
     },
     searchCompleted(){
       return this.search.hasOwnProperty("pageInfo");
@@ -158,52 +121,6 @@ export default {
   }
   input{
     width: 75%;
-  }
-}
-.searchStats{
-  display: flex;
-  justify-content: space-around;
-  align-content: space-around;
-  height: 50px;
-  margin:10px;
-  align-items:baseline;
-  
-  span, button {
-    justify-content: space-around;
-    width: 13%;
-    height: 40px;
-  }
-  span{
-    border-bottom: 2px solid #999999;
-  }
-}
-
-#userContainer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  align-content: space-around;
-  height: auto;
-  margin:10px;
-  
-  .user {
-    background-color: white;
-    box-shadow: 7px 10px lightgrey;
-    flex-grow: 1;
-    justify-content: space-between;
-    width: 25%;
-    min-width: 350px;
-    max-width: 400px;
-    margin:10px 7px
-  }
-
-  .avatar{
-    margin-top: 10px;
-    margin-left: 10px;
-    width:150px;
-    border-radius: 50%;
-    float:left;
-    height: auto;
   }
 }
 </style>

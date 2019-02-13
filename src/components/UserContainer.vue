@@ -17,7 +17,7 @@
             STARRED REPOs: {{node.following.totalCount}}
             </p>
             <p class="bio">{{node.bio}}</p>
-            <a :href="node.url" target="_blank">Go to Profile</a>
+            <a :href="node.url" target="_blank">Go to GitHub Profile</a>
         </div>
     </div>
   </transition>

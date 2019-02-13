@@ -1,4 +1,5 @@
 <template>
+  <transition>
     <div v-if="showResult" id="userContainer">
         <div 
             class="user" 
@@ -17,6 +18,7 @@
             <a :href="node.url" target="_blank">Go to Profile</a>
         </div>
     </div>
+  </transition>
 </template>
 
 <script>
@@ -37,7 +39,7 @@ export default {
   justify-content: space-around;
   align-content: space-around;
   height: auto;
-  margin:10px;
+  margin:10px auto;
   
   .user {
     background-color: white;
@@ -58,6 +60,23 @@ export default {
     float:left;
     height: auto;
   }
+}
+.v-enter-active {
+    animation: slideIn 2s
+}
+.v-leave-active {
+    animation: slideIn 0.5s reverse
+}
+
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        width: 0%;
+    }
+    100% {
+        opacity: 1;
+        width: 100%;
+    }
 }
 </style>
 

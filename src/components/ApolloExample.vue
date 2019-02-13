@@ -18,7 +18,7 @@
       @PageEvent="triggerQuery"
     ></UserStats>
 
-    <div v-if="$apollo.loading">Loading...</div>
+    <div v-if="$apollo.loading && !searchCompleted">Loading...</div>
     <UserContainer 
       :search="search"
       :showResult="showResult">
@@ -67,11 +67,14 @@ export default {
     showResult(){
       var graphQlLoading = this.$apollo.loading;
 
-      if (!this.searchCompleted() || graphQlLoading){
+      if (!this.searchCompleted || graphQlLoading){
         return false;
       }else{
         return true;
       }
+    },
+    searchCompleted(){
+      return this.search.hasOwnProperty("pageInfo");
     }
   },
   methods: {
@@ -93,9 +96,6 @@ export default {
 
       this.$apollo.queries.search.refresh()
     },
-    searchCompleted(){
-      return this.search.hasOwnProperty("pageInfo");
-    }
   },
   beforeMount(){
     this.login();

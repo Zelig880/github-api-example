@@ -1,11 +1,13 @@
 <template>
-    <div v-if="showResult" class="searchStats">
-      <button @click="previousPage()" :disabled="!previousPageAvailable">Previous page</button>
-      <span>Current Page: {{ currentPage }}</span>
-      <span>Total Page: {{ totalPages }}</span>
-      <span>Total Users: {{ search.userCount }}</span>
-      <button @click="nextPage()" :disabled="!nextPageAvailable" >Next page</button>
-    </div>
+    <transition>
+        <div v-if="showResult" class="searchStats">
+        <button @click="previousPage()" :disabled="!previousPageAvailable">Previous page</button>
+        <span>Current Page: {{ currentPage }}</span>
+        <span>Total Page: {{ totalPages }}</span>
+        <span>Total Users: {{ search.userCount }}</span>
+        <button @click="nextPage()" :disabled="!nextPageAvailable" >Next page</button>
+        </div>
+    </transition>
 </template>
 
 <script>
@@ -74,6 +76,26 @@ export default {
   span{
     border-bottom: 2px solid #999999;
   }
+}
+.v-enter-active {
+    animation: BounceIn 2s
+}
+.v-leave-active {
+    animation: BounceIn 0.5s reverse
+}
+
+@keyframes BounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.1);
+    }
+    60% {
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 1;
+        transform: 1;
+    }
 }
 </style>
 

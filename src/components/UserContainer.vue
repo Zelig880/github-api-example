@@ -1,11 +1,12 @@
 <template>
   <transition>
-    <div v-if="showResult" id="userContainer">
+    <div v-if="showResult && search.hasOwnProperty('nodes')" id="userContainer">
         <div 
+
             class="user" 
             v-for="(node, key) in search.nodes" 
             :key="key" 
-            v-if="node.__typename === 'User'"
+            v-if="(node.__typename === 'User')"
         > 
             <img class="avatar" :src="node.avatarUrl" :alt="node.name + 'avatar Image'" />
             <h2>{{node.login}}</h2>

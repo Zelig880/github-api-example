@@ -36,17 +36,17 @@ export default {
             return this.currentPage > 1;
         },
         totalPages(){
-        if(!this.showResult) return 0;
-        
-        var totalPages = Math.ceil(this.search.userCount / 10);
+            if(!this.showResult) return 0;
+            
+            var totalPages = Math.ceil(this.search.userCount / 10);
 
-        return totalPages;
+            return totalPages;
         }
     },
     methods:{
         nextPage () {
             this.nextPageCursor = this.search.pageInfo.endCursor;
-            this.previousPageCursor = this.search.pageInfo.endCursor;
+            this.previousPageCursor = null;
             this.currentPage++;
             this.$emit('PageEvent', 'nextPage', this.nextPageCursor);
         },

@@ -47,13 +47,6 @@
       "@vue/standard"
     ],
     "rules": {
-      "graphql/template-strings": [
-        "error",
-        {
-          "env": "literal",
-          "projectName": "github"
-        }
-      ],
       "vue/no-use-v-if-with-v-for": [
         "error",
         {

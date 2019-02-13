@@ -2,18 +2,20 @@ import Vue from 'vue'
 import VueApollo from 'vue-apollo'
 import schema from '../schema.json'
 import { IntrospectionFragmentMatcher, InMemoryCache } from 'apollo-cache-inmemory';
-import { createApolloClient, restartWebsockets } from 'vue-cli-plugin-apollo/graphql-client'
+import { createApolloClient } from 'vue-cli-plugin-apollo/graphql-client'
 
 // Install the vue plugin
 Vue.use(VueApollo)
 
 // Name of the localStorage item
 const AUTH_TOKEN = 'apollo-token'
+const TOKEN = 'bd8cd29334eaf9fc425e4d5957605432327d6838';
 
 // Http endpoint
 const httpEndpoint = process.env.VUE_APP_GRAPHQL_HTTP || 'https://api.github.com/graphql'
 // Files URL root
 export const filesRoot = process.env.VUE_APP_FILES_ROOT || httpEndpoint.substr(0, httpEndpoint.indexOf('/graphql'))
+
 
 Vue.prototype.$filesRoot = filesRoot
 
@@ -55,16 +57,12 @@ const defaultOptions = {
       return token ? "token ".concat(token) : '';
     }
   }
-
-  // Additional ApolloClient options
-  // apollo: { ... }
-
-  // Client local data (see apollo-link-state)
-  // clientState: { resolvers: { ... }, defaults: { ... } }
 }
 
 // Call this in the Vue app file
 export function createProvider (options = {}) {
+
+  setLocalStorageToken();
   // Create apollo client
   const { apolloClient, wsClient } = createApolloClient({
     ...defaultOptions,
@@ -86,35 +84,11 @@ export function createProvider (options = {}) {
     },
   })
 
-
-
   return apolloProvider
 }
 
-// Manually call this when user log in
-export async function onLogin (apolloClient, token) {
-  if (typeof localStorage !== 'undefined' && token) {
-    localStorage.setItem(AUTH_TOKEN, token)
-  }
-  if (apolloClient.wsClient) restartWebsockets(apolloClient.wsClient)
-  try {
-    await apolloClient.resetStore()
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('%cError on cache reset (login)', 'color: orange;', e.message)
-  }
-}
-
-// Manually call this when user log out
-export async function onLogout (apolloClient) {
-  if (typeof localStorage !== 'undefined') {
-    localStorage.removeItem(AUTH_TOKEN)
-  }
-  if (apolloClient.wsClient) restartWebsockets(apolloClient.wsClient)
-  try {
-    await apolloClient.resetStore()
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('%cError on cache reset (logout)', 'color: orange;', e.message)
+function setLocalStorageToken () {
+  if (typeof localStorage !== 'undefined' && TOKEN) {
+    localStorage.setItem(AUTH_TOKEN, TOKEN)
   }
 }

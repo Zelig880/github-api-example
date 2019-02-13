@@ -78,10 +78,6 @@ export default {
     }
   },
   methods: {
-    async login(){
-        const apolloClient = this.$apollo.provider.defaultClient
-        await onLogin(apolloClient, 'bd8cd29334eaf9fc425e4d5957605432327d6838')
-    },
     triggerQuery(action, cursor){
       this.queryDisabled = false;
 
@@ -96,9 +92,6 @@ export default {
 
       this.$apollo.queries.search.refresh()
     },
-  },
-  beforeMount(){
-    this.login();
   }
 }
 </script>

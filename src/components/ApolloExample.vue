@@ -16,6 +16,7 @@
       :search="search"
       :showResult="showResult"
       @PageEvent="triggerQuery"
+      ref="statsComponent"
     ></UserStats>
 
     <div v-if="$apollo.loading && !searchCompleted">Loading...</div>
@@ -24,11 +25,6 @@
       :showResult="showResult">
     </UserContainer>
 
-    <UserStats 
-      :search="search"
-      :showResult="showResult"
-      @PageEvent="triggerQuery"
-    ></UserStats>
   </div>
 </template>
 
@@ -80,15 +76,22 @@ export default {
       this.queryDisabled = false;
 
       this.$apollo.queries.search.options.variables.user = this.$refs.userInput.value;
-      if(action === "nextPage"){
-        this.$apollo.queries.search.options.variables.afterCursor = cursor;
-        this.$apollo.queries.search.options.variables.beforeCursor = null;
-      }else{
-        this.$apollo.queries.search.options.variables.afterCursor = null;
-        this.$apollo.queries.search.options.variables.beforeCursor = cursor;
+
+      switch (action) {
+        case "nextPage":
+          this.$apollo.queries.search.options.variables.afterCursor = cursor;
+          this.$apollo.queries.search.options.variables.beforeCursor = null;
+          break;
+        case "previousPage":
+          this.$apollo.queries.search.options.variables.afterCursor = null;
+          this.$apollo.queries.search.options.variables.beforeCursor = cursor;
+          break;
+        default:
+          this.$apollo.queries.search.options.variables.afterCursor = null;
+          this.$apollo.queries.search.options.variables.beforeCursor = null;
+          this.$refs.statsComponent.currentPage = 1;
+          break;
       }
-      
-      console.log(this.$apollo.queries.search.options.variables);
       this.$apollo.queries.search.refresh()
     },
   }

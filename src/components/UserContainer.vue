@@ -8,13 +8,14 @@
             v-if="node.__typename === 'User'"
         > 
             <img class="avatar" :src="node.avatarUrl" :alt="node.name + 'avatar Image'" />
-            <h2>{{node.name}}</h2>
-            <h3>{{node.bio}}</h3>
+            <h2>{{node.login}}</h2>
+            <h3>{{node.name}}</h3>
             <p>
             FOLLOWING:  {{node.starredRepositories.totalCount}}<br/>
             FOLLOWERS:  {{node.followers.totalCount}}<br/>
             STARRED REPOs: {{node.following.totalCount}}
             </p>
+            <p class="bio">{{node.bio}}</p>
             <a :href="node.url" target="_blank">Go to Profile</a>
         </div>
     </div>
@@ -49,7 +50,9 @@ export default {
     width: 25%;
     min-width: 350px;
     max-width: 400px;
-    margin:10px 7px
+    margin:10px 7px;
+    text-align: right;
+    padding-right: 20px;
   }
 
   .avatar{
@@ -59,6 +62,10 @@ export default {
     border-radius: 50%;
     float:left;
     height: auto;
+  }
+
+  .bio{
+    text-align: center;
   }
 }
 .v-enter-active {

@@ -1,5 +1,5 @@
 query SearchMostTop10Star($user: String!, $afterCursor: String, $beforeCursor: String) {
-  search(query: $user, type: USER, first: 10, after: $afterCursor, before:$beforeCursor) {
+  search(query: $user, type: USER, last: 10, after: $afterCursor, before:$beforeCursor) {
     pageInfo {
       
       endCursor

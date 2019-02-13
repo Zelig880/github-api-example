@@ -1,11 +1,11 @@
 <template>
     <transition>
         <div v-if="showResult" class="searchStats">
-        <button @click="previousPage()" :disabled="!previousPageAvailable">Previous page</button>
-        <span>Current Page: {{ currentPage }}</span>
-        <span>Total Page: {{ totalPages }}</span>
-        <span>Total Users: {{ search.userCount }}</span>
-        <button @click="nextPage()" :disabled="!nextPageAvailable" >Next page</button>
+          <button @click="previousPage()" :disabled="!previousPageAvailable">Previous page</button>
+          <span>Current Page: {{ currentPage }}</span>
+          <span>Total Page: {{ totalPages }}</span>
+          <span>Total Users: {{ search.userCount }}</span>
+          <button @click="nextPage()" :disabled="!nextPageAvailable" >Next page</button>
         </div>
     </transition>
 </template>

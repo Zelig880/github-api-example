@@ -20,6 +20,7 @@
     ></UserStats>
 
     <div v-if="$apollo.loading && !searchCompleted">Loading...</div>
+    
     <UserContainer
       :search="search"
       :showResult="showResult">

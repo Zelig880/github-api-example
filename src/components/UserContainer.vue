@@ -2,7 +2,6 @@
   <transition>
     <div v-if="showResult && search.hasOwnProperty('nodes')" id="userContainer">
         <div
-
             class="user"
             v-for="(node, key) in search.nodes"
             :key="key"
@@ -12,9 +11,9 @@
             <h2>{{node.login}}</h2>
             <h3>{{node.name}}</h3>
             <p>
-            FOLLOWING:  {{node.starredRepositories.totalCount}}<br/>
-            FOLLOWERS:  {{node.followers.totalCount}}<br/>
-            STARRED REPOs: {{node.following.totalCount}}
+              FOLLOWING:  {{node.starredRepositories.totalCount}}<br/>
+              FOLLOWERS:  {{node.followers.totalCount}}<br/>
+              STARRED REPOs: {{node.following.totalCount}}
             </p>
             <p class="bio">{{node.bio}}</p>
             <a :href="node.url" target="_blank">Go to GitHub Profile</a>

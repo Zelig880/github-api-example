@@ -9,7 +9,7 @@ Vue.use(VueApollo)
 
 // Name of the localStorage item
 const AUTH_TOKEN = 'apollo-token'
-const TOKEN = 'bd8cd29334eaf9fc425e4d5957605432327d6838'
+const TOKEN = 'Place_Personal_Token_here'
 
 // Http endpoint
 const httpEndpoint = process.env.VUE_APP_GRAPHQL_HTTP || 'https://api.github.com/graphql'

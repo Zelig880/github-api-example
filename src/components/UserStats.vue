@@ -12,51 +12,51 @@
 
 <script>
 export default {
-    name: "UserStats",
-    props:{
-        showResult: Boolean,
-        search: Object,
-    },
-    data () {
-        return {
-            currentPage: 1,
-            nextPageCursor: null,
-            previousPageCursor: null,
-        }
-    },
-    computed:{
-        nextPageAvailable(){
-            if(!this.showResult) return false;
-
-            return this.search.pageInfo.hasNextPage;
-        },
-        previousPageAvailable(){
-            if(!this.showResult) return false;
-
-            return this.currentPage > 1;
-        },
-        totalPages(){
-            if(!this.showResult) return 0;
-            
-            var totalPages = Math.ceil(this.search.userCount / 10);
-
-            return totalPages;
-        }
-    },
-    methods:{
-        nextPage () {
-            this.nextPageCursor = this.search.pageInfo.endCursor;
-            this.previousPageCursor = null;
-            this.currentPage++;
-            this.$emit('PageEvent', 'nextPage', this.nextPageCursor);
-        },
-        previousPage(){
-            this.previousPageCursor = this.search.pageInfo.startCursor;
-            this.nextPageCursor = null;
-            this.currentPage--;
-            this.$emit('PageEvent', 'previousPage', this.previousPageCursor);
-        }
+  name: 'UserStats',
+  props: {
+    showResult: Boolean,
+    search: Object
+  },
+  data () {
+    return {
+      currentPage: 1,
+      nextPageCursor: null,
+      previousPageCursor: null
     }
+  },
+  computed: {
+    nextPageAvailable () {
+      if (!this.showResult) return false
+
+      return this.search.pageInfo.hasNextPage
+    },
+    previousPageAvailable () {
+      if (!this.showResult) return false
+
+      return this.currentPage > 1
+    },
+    totalPages () {
+      if (!this.showResult) return 0
+
+      var totalPages = Math.ceil(this.search.userCount / 10)
+
+      return totalPages
+    }
+  },
+  methods: {
+    nextPage () {
+      this.nextPageCursor = this.search.pageInfo.endCursor
+      this.previousPageCursor = null
+      this.currentPage++
+      this.$emit('PageEvent', 'nextPage', this.nextPageCursor)
+    },
+    previousPage () {
+      this.previousPageCursor = this.search.pageInfo.startCursor
+      this.nextPageCursor = null
+      this.currentPage--
+      this.$emit('PageEvent', 'previousPage', this.previousPageCursor)
+    }
+  }
 }
 </script>
 <style lang="scss" scoped >
@@ -67,7 +67,7 @@ export default {
   height: 50px;
   margin:10px;
   align-items:baseline;
-  
+
   span, button {
     justify-content: space-around;
     width: 13%;
@@ -98,4 +98,3 @@ export default {
     }
 }
 </style>
-

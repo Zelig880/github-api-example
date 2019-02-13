@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueApollo from 'vue-apollo'
 import schema from '../schema.json'
-import { IntrospectionFragmentMatcher, InMemoryCache } from 'apollo-cache-inmemory';
+import { IntrospectionFragmentMatcher, InMemoryCache } from 'apollo-cache-inmemory'
 import { createApolloClient } from 'vue-cli-plugin-apollo/graphql-client'
 
 // Install the vue plugin
@@ -9,19 +9,18 @@ Vue.use(VueApollo)
 
 // Name of the localStorage item
 const AUTH_TOKEN = 'apollo-token'
-const TOKEN = 'bd8cd29334eaf9fc425e4d5957605432327d6838';
+const TOKEN = 'bd8cd29334eaf9fc425e4d5957605432327d6838'
 
 // Http endpoint
 const httpEndpoint = process.env.VUE_APP_GRAPHQL_HTTP || 'https://api.github.com/graphql'
 // Files URL root
 export const filesRoot = process.env.VUE_APP_FILES_ROOT || httpEndpoint.substr(0, httpEndpoint.indexOf('/graphql'))
 
-
 Vue.prototype.$filesRoot = filesRoot
 
 const fragmentMatcher = new IntrospectionFragmentMatcher({
-  introspectionQueryResultData: schema,
-});
+  introspectionQueryResultData: schema
+})
 
 // Config
 const defaultOptions = {
@@ -49,24 +48,23 @@ const defaultOptions = {
   cache: new InMemoryCache({ fragmentMatcher }),
 
   // Override the way the Authorization header is set
-  getAuth: (tokenName) => {  
+  getAuth: (tokenName) => {
     if (typeof window !== 'undefined') {
       // get the authentication token from local storage if it exists
-      var token = window.localStorage.getItem(tokenName); // return the headers to the context so httpLink can read them
+      var token = window.localStorage.getItem(tokenName) // return the headers to the context so httpLink can read them
 
-      return token ? "token ".concat(token) : '';
+      return token ? 'token '.concat(token) : ''
     }
   }
 }
 
 // Call this in the Vue app file
 export function createProvider (options = {}) {
-
-  setLocalStorageToken();
+  setLocalStorageToken()
   // Create apollo client
   const { apolloClient, wsClient } = createApolloClient({
     ...defaultOptions,
-    ...options,
+    ...options
   })
   apolloClient.wsClient = wsClient
 
@@ -76,12 +74,12 @@ export function createProvider (options = {}) {
     defaultOptions: {
       $query: {
         // fetchPolicy: 'cache-and-network',
-      },
+      }
     },
     errorHandler (error) {
       // eslint-disable-next-line no-console
       console.log('%cError', 'background: red; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;', error.message)
-    },
+    }
   })
 
   return apolloProvider

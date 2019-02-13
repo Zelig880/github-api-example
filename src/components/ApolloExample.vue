@@ -8,11 +8,11 @@
         id="field-name"
         ref="userInput"
       >
-      
+
       <button @click="triggerQuery()" @disabled="$apollo.queries.search.loading" >Search</button>
     </div>
 
-    <UserStats 
+    <UserStats
       :search="search"
       :showResult="showResult"
       @PageEvent="triggerQuery"
@@ -20,7 +20,7 @@
     ></UserStats>
 
     <div v-if="$apollo.loading && !searchCompleted">Loading...</div>
-    <UserContainer 
+    <UserContainer
       :search="search"
       :showResult="showResult">
     </UserContainer>
@@ -43,57 +43,57 @@ export default {
     UserStats,
     UserContainer
   },
-  apollo:{
-    search:{
+  apollo: {
+    search: {
       query: require('../graphql/User.gql'),
       variables: {
-          user: "",
-          afterCursor:  null,
-          beforeCursor: null
+        user: '',
+        afterCursor: null,
+        beforeCursor: null
       },
       fetchPolicy: 'cache-and-network',
-      skip() {
+      skip () {
         return this.queryDisabled
       }
     }
   },
   computed: {
-    showResult(){
-      var graphQlLoading = this.$apollo.loading;
+    showResult () {
+      var graphQlLoading = this.$apollo.loading
 
-      if (!this.searchCompleted || graphQlLoading){
-        return false;
-      }else{
-        return true;
+      if (!this.searchCompleted || graphQlLoading) {
+        return false
+      } else {
+        return true
       }
     },
-    searchCompleted(){
-      return this.search.hasOwnProperty("pageInfo");
+    searchCompleted () {
+      return this.search.hasOwnProperty('pageInfo')
     }
   },
   methods: {
-    triggerQuery(action, cursor){
-      this.queryDisabled = false;
+    triggerQuery (action, cursor) {
+      this.queryDisabled = false
 
-      this.$apollo.queries.search.options.variables.user = this.$refs.userInput.value;
+      this.$apollo.queries.search.options.variables.user = this.$refs.userInput.value
 
       switch (action) {
-        case "nextPage":
-          this.$apollo.queries.search.options.variables.afterCursor = cursor;
-          this.$apollo.queries.search.options.variables.beforeCursor = null;
-          break;
-        case "previousPage":
-          this.$apollo.queries.search.options.variables.afterCursor = null;
-          this.$apollo.queries.search.options.variables.beforeCursor = cursor;
-          break;
+        case 'nextPage':
+          this.$apollo.queries.search.options.variables.afterCursor = cursor
+          this.$apollo.queries.search.options.variables.beforeCursor = null
+          break
+        case 'previousPage':
+          this.$apollo.queries.search.options.variables.afterCursor = null
+          this.$apollo.queries.search.options.variables.beforeCursor = cursor
+          break
         default:
-          this.$apollo.queries.search.options.variables.afterCursor = null;
-          this.$apollo.queries.search.options.variables.beforeCursor = null;
-          this.$refs.statsComponent.currentPage = 1;
-          break;
+          this.$apollo.queries.search.options.variables.afterCursor = null
+          this.$apollo.queries.search.options.variables.beforeCursor = null
+          this.$refs.statsComponent.currentPage = 1
+          break
       }
       this.$apollo.queries.search.refresh()
-    },
+    }
   }
 }
 </script>

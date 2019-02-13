@@ -1,13 +1,13 @@
 <template>
   <transition>
     <div v-if="showResult && search.hasOwnProperty('nodes')" id="userContainer">
-        <div 
+        <div
 
-            class="user" 
-            v-for="(node, key) in search.nodes" 
-            :key="key" 
+            class="user"
+            v-for="(node, key) in search.nodes"
+            :key="key"
             v-if="(node.__typename === 'User')"
-        > 
+        >
             <img class="avatar" :src="node.avatarUrl" :alt="node.name + 'avatar Image'" />
             <h2>{{node.login}}</h2>
             <h3>{{node.name}}</h3>
@@ -25,12 +25,12 @@
 
 <script>
 export default {
-    
-    name: "UserContainer",
-    props:{
-        showResult: Boolean,
-        search: Object,
-    }
+
+  name: 'UserContainer',
+  props: {
+    showResult: Boolean,
+    search: Object
+  }
 }
 </script>
 
@@ -42,7 +42,7 @@ export default {
   align-content: space-around;
   height: auto;
   margin:10px auto;
-  
+
   .user {
     background-color: white;
     box-shadow: 7px 10px lightgrey;
@@ -87,5 +87,3 @@ export default {
     }
 }
 </style>
-
-

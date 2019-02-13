@@ -33,8 +33,6 @@
 </template>
 
 <script>
-import { onLogin } from '../vue-apollo'
-import { async } from 'q';
 import UserStats from './UserStats.vue'
 import UserContainer from './UserContainer.vue'
 
@@ -89,7 +87,8 @@ export default {
         this.$apollo.queries.search.options.variables.afterCursor = null;
         this.$apollo.queries.search.options.variables.beforeCursor = cursor;
       }
-
+      
+      console.log(this.$apollo.queries.search.options.variables);
       this.$apollo.queries.search.refresh()
     },
   }
